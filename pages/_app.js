@@ -1,12 +1,15 @@
-import firebase from "firebase/app";
-import { ChakraProvider } from "@chakra-ui/react";
-import { firebaseConfig } from "constants/firebase";
+import { useEffect } from "react";
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+import { ChakraProvider } from "@chakra-ui/react";
+import { firebaseInit, signInAnonymously } from "utils/firebase";
 
 function App({ Component, pageProps }) {
+  useEffect(() => {
+    firebaseInit();
+    signInAnonymously();
+    return () => {};
+  }, []);
+
   return (
     <ChakraProvider>
       <Component {...pageProps} />
