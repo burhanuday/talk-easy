@@ -1,10 +1,8 @@
-import firebase from "firebase/app";
 import { ChakraProvider } from "@chakra-ui/react";
-import { firebaseConfig } from "constants/firebase";
+import { firebaseInit, signInAnonymously } from "utils/firebase";
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+firebaseInit();
+signInAnonymously();
 
 function App({ Component, pageProps }) {
   return (
