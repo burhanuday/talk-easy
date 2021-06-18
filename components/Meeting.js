@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { agoraPublicKeys } from "constants/agora";
-import { Container, Flex } from "@chakra-ui/react";
+import { Container, Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
 
@@ -193,23 +193,37 @@ const Meeting = () => {
   }
 
   return (
-    <Container>
-      {rtcRef.current && (
-        <Flex>
-          <div
-            ref={localStreamRef}
-            id="local-stream"
-            style={{ display: joined ? "block" : "none", height: "200px", width: "200px" }}
-          />
+    <Box p={8} w="100vw">
+      <Grid w="100%" templateColumns="2fr 1fr">
+        {/* Video call */}
+        <Box w="100%" bg="black">
+          {rtcRef.current && (
+            <Flex w="100%">
+              <div
+                ref={localStreamRef}
+                id="local-stream"
+                style={{ display: "none" }}
+                // style={{ display: joined ? "block" : "none", height: "200px", width: "200px" }}
+              />
 
-          <div
-            ref={remoteStreamRef}
-            id="remote-stream"
-            style={{ display: joined ? "block" : "none", height: "200px", width: "200px" }}
-          />
-        </Flex>
-      )}
-    </Container>
+              <div
+                ref={remoteStreamRef}
+                id="remote-stream"
+                style={{ display: joined ? "block" : "none", height: "350px", width: "100%" }}
+              />
+            </Flex>
+          )}
+        </Box>
+
+        {/* Audio recording */}
+        <Box w="100%">Audio stuff here</Box>
+      </Grid>
+
+      {/* Transcription */}
+      <Box w="100%" bg="gray.200">
+        Transcription here
+      </Box>
+    </Box>
   );
 };
 
