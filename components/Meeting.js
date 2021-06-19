@@ -29,7 +29,7 @@ const Meeting = () => {
   const localStreamRef = useRef(null);
   const remoteStreamRef = useRef(null);
 
-  const debouncedGoogleTranslate = useRef(
+  const throtlledGoogleTranslate = useRef(
     throttle(async (text, from, to) => {
       const result = await fetch("/api/only-translate", {
         body: JSON.stringify({
@@ -132,14 +132,14 @@ const Meeting = () => {
     const subtitleRef = firebase.database().ref("meetings/" + meetingId);
     subtitleRef.on("value", (snapshot) => {
       const data = snapshot.val();
-      debouncedGoogleTranslate(data.text, "", userLanguageForTranslation);
+      // if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
     });
 
     return () => {
       unsubs();
       unsubscribe();
     };
-  }, [meetingId, userLanguage, userId, debouncedGoogleTranslate]);
+  }, [meetingId, userLanguage, userId, throtlledGoogleTranslate]);
 
   const addParticipantToMeeting = useCallback(async () => {
     const userId = getUserId();
