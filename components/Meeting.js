@@ -6,8 +6,7 @@ import { agoraPublicKeys } from "constants/agora";
 import { Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
-import { getUserId } from "utils/auth";
-import { getUserLanguage } from "utils/language";
+import { getUserId, getUserLanguage } from "utils/storage";
 
 const Meeting = () => {
   const router = useRouter();

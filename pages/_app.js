@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { firebaseInit, signInAnonymously } from "utils/firebase";
-import { getUserLanguage, setUserLanguage } from "utils/language";
+import { getUserLanguage, setUserLanguage } from "utils/storage";
 
 function App({ Component, pageProps }) {
   const setDefaultLanguage = () => {
