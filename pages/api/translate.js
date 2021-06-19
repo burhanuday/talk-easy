@@ -2,7 +2,7 @@ import { db, firestore } from "utils/firebase-admin";
 import { googleTranslate } from "utils/translate";
 
 export default async function handler(req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   if (req.method === "POST") {
     const { languages, meetingId, rawText, userLanguage, userId } = req.body;
 

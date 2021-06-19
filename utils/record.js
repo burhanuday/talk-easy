@@ -27,7 +27,6 @@ export const init = () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   //   console.log(SpeechRecognition);
   recognition = new SpeechRecognition();
-  console.log("recognition", recognition);
   recognition.continuous = true;
   recognition.interimResults = false; // TODO: test with true as well
   recognition.lang = getUserLanguage();

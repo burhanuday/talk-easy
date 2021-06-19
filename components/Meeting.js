@@ -3,14 +3,19 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import { useRouter } from "next/router";
 import { agoraPublicKeys } from "constants/agora";
-import { Flex, Grid, Box, Button } from "@chakra-ui/react";
+import { Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
 import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
-import { startRecording, stopRecording, init } from "utils/audio";
+import { init as initRecording } from "utils/record";
+import { init as initSpeaking, speak } from "utils/speak";
 import TranscriptBox from "./TranscriptBox";
+import RecordBtns from "./RecordBtns";
 
 const Meeting = () => {
+  const userLanguage = getUserLanguage().split("-")[0];
+  const userId = getUserId();
+
   const router = useRouter();
   const { meetingId } = router.query;
 
@@ -64,7 +69,9 @@ const Meeting = () => {
   };
 
   useEffect(() => {
-    init();
+    initRecording();
+    initSpeaking();
+
     const db = firebase.firestore();
 
     const unsubs = db
@@ -88,6 +95,14 @@ const Meeting = () => {
           });
         });
 
+        if (newMessages.length) {
+          const message = newMessages[newMessages.length - 1];
+          if (message.userId !== userId) {
+            const { text } = message.texts.find((t) => t.lang === userLanguage);
+            speak(text);
+          }
+        }
+
         setMessages(newMessages);
       });
 
@@ -95,7 +110,7 @@ const Meeting = () => {
       unsubs();
       unsubscribe();
     };
-  }, [meetingId]);
+  }, [meetingId, userLanguage, userId]);
 
   const addParticipantToMeeting = useCallback(async () => {
     const userId = getUserId();
@@ -275,8 +290,7 @@ const Meeting = () => {
 
         {/* Audio recording */}
         <Box w="100%">
-          <Button onClick={startRecording}> Record </Button>
-          <Button onClick={() => stopRecording()}> Stop Record </Button>
+          <RecordBtns />
         </Box>
       </Grid>
 
