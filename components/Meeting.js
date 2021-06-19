@@ -8,6 +8,7 @@ import { Flex, Grid, Box } from "@chakra-ui/react";
 import AgoraRTC from "agora-rtc-sdk";
 import { getUserId } from "utils/auth";
 import { getUserLanguage } from "utils/language";
+import { translatedText } from "utils/textTranslate";
 
 const Meeting = () => {
   const router = useRouter();
@@ -33,6 +34,7 @@ const Meeting = () => {
    * Handle user pressing the leave button or
    * the other user pressed the leave button
    */
+  // eslint-disable-next-line no-unused-vars
   const handleLeave = () => {
     const rtc = rtcRef.current;
 
@@ -206,7 +208,7 @@ const Meeting = () => {
     const f = async () => {
       await Promise.all([joinAgoraCall(), addParticipantToMeeting()]);
     };
-
+    translate();
     f();
   }, [joinAgoraCall, addParticipantToMeeting]);
 
