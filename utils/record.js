@@ -1,4 +1,4 @@
-import { getMeetingDetails, getUserId, getUserLanguage } from "utils/storage";
+import { getUserLanguage } from "utils/storage";
 
 let recognition;
 
@@ -18,7 +18,7 @@ export const stopRecording = () => {
   }
 };
 
-export const init = () => {
+export const init = (onResult) => {
   if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
     console.error("Speech Recognition Not Available");
     return;
@@ -28,7 +28,7 @@ export const init = () => {
   //   console.log(SpeechRecognition);
   recognition = new SpeechRecognition();
   recognition.continuous = true;
-  recognition.interimResults = false; // TODO: test with true as well
+  recognition.interimResults = true;
   recognition.lang = getUserLanguage();
 
   //   recognition.onstart = () => {
@@ -39,26 +39,5 @@ export const init = () => {
   //     console.log("ended", e);
   //   };
 
-  recognition.onresult = async (event) => {
-    try {
-      const rawText = event.results[0][0].transcript;
-      const data = getMeetingDetails();
-
-      await fetch("/api/translate", {
-        method: "POST",
-        body: JSON.stringify({
-          rawText,
-          meetingId: data.id,
-          userId: getUserId(),
-          languages: data.languages,
-          userLanguage: getUserLanguage().split("-")[0],
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  recognition.onresult = onResult;
 };

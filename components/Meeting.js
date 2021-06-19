@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -7,7 +8,6 @@ import { Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
 import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
-import { init as initRecording } from "utils/record";
 import { init as initSpeaking, speak } from "utils/speak";
 import TranscriptBox from "./TranscriptBox";
 import RecordBtns from "./RecordBtns";
@@ -69,7 +69,6 @@ const Meeting = () => {
   };
 
   useEffect(() => {
-    initRecording();
     initSpeaking();
 
     const db = firebase.firestore();
