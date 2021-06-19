@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       data.push(`[${date}] ${messageUserId === userId ? "You" : "Peer"} : ${text}`);
     }
 
-    const filename = `${meetingId}-${userId}.txt`;
+    const filename = `${meetingId}-${userId}`;
     const filepath = path.join(tmpdir, filename);
     const destFilePath = `talkeasy/${filename}`;
 
