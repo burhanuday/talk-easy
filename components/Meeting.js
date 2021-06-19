@@ -1,9 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import firebase from "firebase/app";
+import "firebase/firestore";
 import { useRouter } from "next/router";
 import { agoraPublicKeys } from "constants/agora";
-import { Container, Flex, Grid, Box } from "@chakra-ui/react";
+import { Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
+import { getUserId } from "utils/auth";
+import { getUserLanguage } from "utils/language";
 
 const Meeting = () => {
   const router = useRouter();
@@ -57,10 +61,25 @@ const Meeting = () => {
     }
   };
 
+  const addParticipantToMeeting = useCallback(async () => {
+    const userId = getUserId();
+    const lang = getUserLanguage().split("-")[0];
+
+    const db = firebase.firestore();
+
+    await db
+      .collection("meetings")
+      .doc(meetingId)
+      .update({
+        participants: firebase.firestore.FieldValue.arrayUnion(userId),
+        languages: firebase.firestore.FieldValue.arrayUnion(lang),
+      });
+  }, [meetingId]);
+
   /**
    * Attemp to join Agora call
    */
-  const handleSubmit = useCallback(async () => {
+  const joinAgoraCall = useCallback(async () => {
     const rtc = rtcRef.current;
 
     if (!rtc || !meetingId) {
@@ -181,12 +200,15 @@ const Meeting = () => {
     );
   }, [rtcRef, meetingId]);
 
-  // Fetch expert data
   // Call handleLeave when this component is unmounted
   // Clean artifacts from Agora video call and exit gracefully
   useEffect(() => {
-    handleSubmit();
-  }, [handleSubmit]);
+    const f = async () => {
+      await Promise.all([joinAgoraCall(), addParticipantToMeeting()]);
+    };
+
+    f();
+  }, [joinAgoraCall, addParticipantToMeeting]);
 
   if (typeof window === "undefined") {
     return "";
