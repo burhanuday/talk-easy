@@ -8,12 +8,14 @@ import { Flex, Grid, Box, Button } from "@chakra-ui/react";
 import AgoraRTC from "agora-rtc-sdk";
 import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
 import { startRecording, stopRecording, init } from "utils/audio";
+import TranscriptBox from "./TranscriptBox";
 
 const Meeting = () => {
   const router = useRouter();
   const { meetingId } = router.query;
 
   const [joined, setJoined] = useState(false);
+  const [messages, setMessages] = useState([]);
 
   const localStreamRef = useRef(null);
   const remoteStreamRef = useRef(null);
@@ -71,8 +73,27 @@ const Meeting = () => {
       .onSnapshot((snapshot) => {
         setMeetingDetails({ id: meetingId, ...snapshot.data() });
       });
+
+    const unsubscribe = db
+      .collection("meetings")
+      .doc(meetingId)
+      .collection("messages")
+      .orderBy("createdAt", "asc")
+      .onSnapshot((docs) => {
+        const newMessages = [];
+        docs.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+
+        setMessages(newMessages);
+      });
+
     return () => {
       unsubs();
+      unsubscribe();
     };
   }, [meetingId]);
 
@@ -261,7 +282,7 @@ const Meeting = () => {
 
       {/* Transcription */}
       <Box w="100%" bg="gray.200">
-        Transcription here
+        <TranscriptBox messages={messages} />
       </Box>
     </Box>
   );
