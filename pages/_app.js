@@ -4,6 +4,8 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { firebaseInit, signInAnonymously } from "utils/firebase";
 import { getUserLanguage, setUserLanguage } from "utils/storage";
 
+firebaseInit();
+
 function App({ Component, pageProps }) {
   const setDefaultLanguage = () => {
     const langauge = getUserLanguage();
@@ -14,7 +16,6 @@ function App({ Component, pageProps }) {
 
   useEffect(() => {
     setDefaultLanguage();
-    firebaseInit();
     signInAnonymously();
   }, []);
 

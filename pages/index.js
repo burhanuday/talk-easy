@@ -23,14 +23,14 @@ import { getUserId, getUserLanguage, setUserLanguage } from "utils/storage";
 export default function Home() {
   const [link, setLink] = useState("");
   const [newMeetingId, setNewMeetingId] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const router = useRouter();
   const handleLinkChange = (e) => {
     setLink(e.target.value);
   };

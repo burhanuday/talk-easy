@@ -3,10 +3,11 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import { useRouter } from "next/router";
 import { agoraPublicKeys } from "constants/agora";
-import { Flex, Grid, Box } from "@chakra-ui/react";
+import { Flex, Grid, Box, Button } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
-import { getUserId, getUserLanguage } from "utils/storage";
+import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
+import { startRecording, stopRecording, init } from "utils/audio";
 
 const Meeting = () => {
   const router = useRouter();
@@ -60,6 +61,21 @@ const Meeting = () => {
     }
   };
 
+  useEffect(() => {
+    init();
+    const db = firebase.firestore();
+
+    const unsubs = db
+      .collection("meetings")
+      .doc(meetingId)
+      .onSnapshot((snapshot) => {
+        setMeetingDetails({ id: meetingId, ...snapshot.data() });
+      });
+    return () => {
+      unsubs();
+    };
+  }, [meetingId]);
+
   const addParticipantToMeeting = useCallback(async () => {
     const userId = getUserId();
     const lang = getUserLanguage().split("-")[0];
@@ -105,7 +121,7 @@ const Meeting = () => {
     }).then((response) => response.json());
 
     const token = response.token;
-    console.log(response.token, agoraPublicKeys);
+    // console.log(response.token, agoraPublicKeys);
 
     rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "h264" });
     rtc.client.init(
@@ -237,7 +253,10 @@ const Meeting = () => {
         </Box>
 
         {/* Audio recording */}
-        <Box w="100%">Audio stuff here</Box>
+        <Box w="100%">
+          <Button onClick={startRecording}> Record </Button>
+          <Button onClick={() => stopRecording()}> Stop Record </Button>
+        </Box>
       </Grid>
 
       {/* Transcription */}

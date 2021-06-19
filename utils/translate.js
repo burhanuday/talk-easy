@@ -1,4 +1,4 @@
-import translate from "google-translate-api";
+import translate from "translation-google";
 
 /**
  * Translate a sentence from initial language to target language
@@ -11,14 +11,14 @@ export const googleTranslate = async (text, from, to) => {
   try {
     const res = await translate(text, { from, to });
 
-    console.log("text:", res.text);
-    //=> Ik spreek Nederlands!
-    console.log(res.from.text.autoCorrected);
-    //=> true
-    console.log(res.from.text.value);
-    //=> I [speak] Dutch!
-    console.log(res.from.text.didYouMean);
-    //=> false
+    // console.log("text:", res.text);
+    // //=> Ik spreek Nederlands!
+    // console.log(res.from.text.autoCorrected);
+    // //=> true
+    // console.log(res.from.text.value);
+    // //=> I [speak] Dutch!
+    // console.log(res.from.text.didYouMean);
+    // //=> false
 
     return res.text;
   } catch (error) {
