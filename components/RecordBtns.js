@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { startRecording, stopRecording } from "utils/record";
-import { Button } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
+import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 
 export default function RecordBtns() {
   const [recording, setRecording] = useState(false);
@@ -12,5 +13,12 @@ export default function RecordBtns() {
     setRecording((r) => !r);
   };
 
-  return <Button onClick={handleRecordClick}> {!recording ? "Record" : "Stop Recording"} </Button>;
+  return (
+    <Flex justifyContent="flex-end" px={2} py={2} borderRadius="md" bg="gray.100" ml={2}>
+      <Text></Text>
+      <Button onClick={handleRecordClick} colorScheme="green">
+        {!recording ? <FaMicrophone /> : <FaMicrophoneSlash />}
+      </Button>
+    </Flex>
+  );
 }

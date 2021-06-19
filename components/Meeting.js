@@ -295,7 +295,7 @@ const Meeting = () => {
       </Grid>
 
       {/* Transcription */}
-      <Box w="100%" bg="gray.200">
+      <Box w="100%" height="35vh" p={2} mt={2} borderRadius="md" overflowY="auto" bg="gray.100">
         <TranscriptBox messages={messages} />
       </Box>
     </Box>

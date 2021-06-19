@@ -25,7 +25,9 @@ export default async function handler(req, res) {
     const filepath = path.join(tmpdir, filename);
     const destFilePath = `talkeasy/${filename}`;
 
-    fs.writeFileSync(filepath, data.join("\n"), {});
+    fs.writeFileSync(filepath, data.join("\n"), {
+      encoding: "utf-8",
+    });
     await bucket.upload(filepath, { destination: destFilePath });
     const file = bucket.file(destFilePath);
     const [url] = await file.getSignedUrl({ action: "read", expires: "01-01-2500" });

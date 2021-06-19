@@ -9,7 +9,7 @@ import translate from "translation-google";
  */
 export const googleTranslate = async (text, from, to) => {
   try {
-    const res = await translate(text, { from, to });
+    const res = await translate(text, { from: "auto", to });
 
     // console.log("text:", res.text);
     // //=> Ik spreek Nederlands!

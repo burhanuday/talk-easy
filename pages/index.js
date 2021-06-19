@@ -14,11 +14,13 @@ import {
   useDisclosure,
   Select,
   Box,
+  IconButton,
 } from "@chakra-ui/react";
 import NewMeetingModal from "components/NewMeetingModal";
 import { appConfig } from "constants/app";
 import { langaugeOptions } from "constants/supportedLanguages";
 import { getUserId, getUserLanguage, setUserLanguage } from "utils/storage";
+import { FaFileDownload } from "react-icons/fa";
 
 export default function Home() {
   const [link, setLink] = useState("");
@@ -27,6 +29,7 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [transcriptionLoading, setTranscriptionLoading] = useState(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -47,6 +50,38 @@ export default function Home() {
     } else {
       router.push(`${appConfig.clientLocation}/meeting/${link}`);
     }
+  };
+
+  const handleTranscriptionDownload = async (meetingId) => {
+    setTranscriptionLoading(meetingId);
+
+    const userId = getUserId();
+    const userLanguage = getUserLanguage();
+
+    const response = await fetch("/api/transcript", {
+      body: JSON.stringify({
+        meetingId,
+        userId,
+        userLanguage,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    }).then((response) => response.json());
+
+    console.log(response);
+
+    const url = response.url;
+
+    const a = document.createElement("a");
+    a.setAttribute("download", "true");
+    a.setAttribute("href", url);
+    a.setAttribute("target", "_blank");
+
+    a.click();
+
+    setTranscriptionLoading(false);
   };
 
   const handleNewMeetingPressed = async () => {
@@ -74,6 +109,7 @@ export default function Home() {
       const querySnapshot = await db
         .collection("meetings")
         .where("participants", "array-contains", userId)
+        .orderBy("createdAt", "desc")
         .get();
 
       const newHistory = [];
@@ -158,21 +194,40 @@ export default function Home() {
               Join
             </Button>
           </HStack>
-        </Flex>
 
-        <Box>
-          <Heading as="h3" size="md">
+          <Heading mt={8} as="h3" size="md">
             History
           </Heading>
-          {history.map((item) => {
-            return (
-              <Box key={item.key}>
-                {item.createdAt.toDate().toLocaleTimeString()}{" "}
-                {item.createdAt.toDate().toLocaleDateString()}
-              </Box>
-            );
-          })}
-        </Box>
+
+          <Box p={4} height="40vh" overflowY="auto">
+            {history.map((item) => {
+              return (
+                <Flex
+                  mb={2}
+                  p={3}
+                  boxShadow="md"
+                  key={item.id}
+                  border={"1px solid #eee"}
+                  borderRadius="md"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Text>
+                    Meeting at {item.createdAt.toDate().toLocaleTimeString()}{" "}
+                    {item.createdAt.toDate().toLocaleDateString()}
+                  </Text>
+                  <IconButton
+                    isLoading={transcriptionLoading === item.id}
+                    onClick={() => handleTranscriptionDownload(item.id)}
+                    colorScheme="green"
+                    aria-label="Download"
+                    icon={<FaFileDownload />}
+                  />
+                </Flex>
+              );
+            })}
+          </Box>
+        </Flex>
 
         <NewMeetingModal isOpen={isOpen} onClose={onClose} meetingId={newMeetingId} />
       </Container>
