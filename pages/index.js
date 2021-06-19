@@ -17,8 +17,8 @@ import {
 } from "@chakra-ui/react";
 import NewMeetingModal from "components/NewMeetingModal";
 import { appConfig } from "constants/app";
-import { getUserLanguage, setUserLanguage } from "utils/language";
 import { langaugeOptions } from "constants/supportedLanguages";
+import { getUserId, getUserLanguage, setUserLanguage } from "utils/storage";
 
 export default function Home() {
   const [link, setLink] = useState("");
@@ -26,6 +26,8 @@ export default function Home() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [history, setHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   const router = useRouter();
 
@@ -62,8 +64,40 @@ export default function Home() {
     setLoading(false);
   };
 
+  const fetchHistory = async () => {
+    const userId = getUserId();
+
+    if (userId) {
+      setLoadingHistory(true);
+      const db = firebase.firestore();
+
+      const querySnapshot = await db
+        .collection("meetings")
+        .where("participants", "array-contains", userId)
+        .get();
+
+      const newHistory = [];
+
+      querySnapshot.docs.forEach((doc) => {
+        newHistory.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+
+      setHistory(newHistory);
+      setLoadingHistory(false);
+    }
+  };
+
   useEffect(() => {
     setSelectedLanguage(getUserLanguage() || "en-IN");
+
+    const f = async () => {
+      await fetchHistory();
+    };
+
+    f();
   }, []);
 
   return (
@@ -73,8 +107,8 @@ export default function Home() {
         <meta name="description" content="Talk easy" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Container h="100vh" maxW="container.lg">
-        <Flex h="100vh" justifyContent="center" flexDir="column">
+      <Container minH="100vh" maxW="container.lg">
+        <Flex minH="100vh" justifyContent="center" flexDir="column">
           <Heading as="h1" size="4xl">
             TalkEasy
           </Heading>
@@ -125,6 +159,20 @@ export default function Home() {
             </Button>
           </HStack>
         </Flex>
+
+        <Box>
+          <Heading as="h3" size="md">
+            History
+          </Heading>
+          {history.map((item) => {
+            return (
+              <Box key={item.key}>
+                {item.createdAt.toDate().toLocaleTimeString()}{" "}
+                {item.createdAt.toDate().toLocaleDateString()}
+              </Box>
+            );
+          })}
+        </Box>
 
         <NewMeetingModal isOpen={isOpen} onClose={onClose} meetingId={newMeetingId} />
       </Container>
