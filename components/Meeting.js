@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import "firebase/database";
 import { useRouter } from "next/router";
 import { agoraPublicKeys } from "constants/agora";
 import { Flex, Grid, Box } from "@chakra-ui/react";
@@ -11,6 +12,8 @@ import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
 import { init as initSpeaking, speak } from "utils/speak";
 import TranscriptBox from "./TranscriptBox";
 import RecordBtns from "./RecordBtns";
+import throttle from "lodash.throttle";
+import { googleTranslate } from "utils/translate";
 
 const Meeting = () => {
   const userLanguage = getUserLanguage().split("-")[0];
@@ -21,9 +24,27 @@ const Meeting = () => {
 
   const [joined, setJoined] = useState(false);
   const [messages, setMessages] = useState([]);
+  const [subtitle, setSubtitle] = useState("");
 
   const localStreamRef = useRef(null);
   const remoteStreamRef = useRef(null);
+
+  const debouncedGoogleTranslate = useRef(
+    throttle(async (text, from, to) => {
+      const result = await fetch("/api/only-translate", {
+        body: JSON.stringify({
+          text,
+          from,
+          to,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }).then((response) => response.json());
+      setSubtitle(result.text);
+    }, 500),
+  ).current;
 
   const rtcRef = useRef({
     client: null,
@@ -71,6 +92,8 @@ const Meeting = () => {
   useEffect(() => {
     initSpeaking();
 
+    const userLanguageForTranslation = getUserLanguage().split("-")[0];
+
     const db = firebase.firestore();
 
     const unsubs = db
@@ -103,13 +126,20 @@ const Meeting = () => {
         }
 
         setMessages(newMessages);
+        setSubtitle("");
       });
+
+    const subtitleRef = firebase.database().ref("meetings/" + meetingId);
+    subtitleRef.on("value", (snapshot) => {
+      const data = snapshot.val();
+      debouncedGoogleTranslate(data.text, "", userLanguageForTranslation);
+    });
 
     return () => {
       unsubs();
       unsubscribe();
     };
-  }, [meetingId, userLanguage, userId]);
+  }, [meetingId, userLanguage, userId, debouncedGoogleTranslate]);
 
   const addParticipantToMeeting = useCallback(async () => {
     const userId = getUserId();
@@ -270,7 +300,7 @@ const Meeting = () => {
         {/* Video call */}
         <Box w="100%" bg="black">
           {rtcRef.current && (
-            <Flex w="100%">
+            <Flex w="100%" position="relative">
               <div
                 ref={localStreamRef}
                 id="local-stream"
@@ -283,13 +313,24 @@ const Meeting = () => {
                 id="remote-stream"
                 style={{ display: joined ? "block" : "none", height: "350px", width: "100%" }}
               />
+
+              <Box
+                color="white"
+                bg="rgba(0,0,0,0.3)"
+                position="absolute"
+                bottom="0"
+                left="0"
+                right="0"
+              >
+                {subtitle}
+              </Box>
             </Flex>
           )}
         </Box>
 
         {/* Audio recording */}
         <Box w="100%">
-          <RecordBtns />
+          <RecordBtns meetingId={meetingId} />
         </Box>
       </Grid>
 

@@ -8,18 +8,9 @@ import translate from "translation-google";
  * @returns translated text
  */
 export const googleTranslate = async (text, from, to) => {
+  console.log("data in translate", text, from, to);
   try {
     const res = await translate(text, { from: "auto", to });
-
-    // console.log("text:", res.text);
-    // //=> Ik spreek Nederlands!
-    // console.log(res.from.text.autoCorrected);
-    // //=> true
-    // console.log(res.from.text.value);
-    // //=> I [speak] Dutch!
-    // console.log(res.from.text.didYouMean);
-    // //=> false
-
     return res.text;
   } catch (error) {
     console.log("error while translating", error);

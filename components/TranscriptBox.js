@@ -11,7 +11,6 @@ const TranscriptBox = ({ messages }) => {
     const trans = [];
     messages.forEach((message) => {
       const text = message.texts.find((t) => t.lang === userLanguage);
-      console.log("text", text);
       if (text) {
         trans.push({
           id: message.id,
@@ -21,12 +20,11 @@ const TranscriptBox = ({ messages }) => {
       }
     });
 
-    console.log(trans);
     setTranscript(trans);
   }, [messages]);
 
   return (
-    <Box maxH="50vh" overflowY="auto">
+    <Box>
       {transcript.map((message) => {
         return (
           <Box key={message.id}>

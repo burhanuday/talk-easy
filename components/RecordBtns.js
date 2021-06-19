@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import firebase from "firebase/app";
+import "firebase/database";
 import { init as initRecording, startRecording, stopRecording } from "utils/record";
 import { Button, Flex, Text } from "@chakra-ui/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { getMeetingDetails, getUserId, getUserLanguage } from "utils/storage";
 
-export default function RecordBtns() {
+export default function RecordBtns({ meetingId }) {
   const [recording, setRecording] = useState(false);
   const [intermediateText, setIntermediateText] = useState("");
 
@@ -37,6 +39,12 @@ export default function RecordBtns() {
           let interim_transcript = "";
           for (let i = event.resultIndex; i < event.results.length; ++i)
             interim_transcript += event.results[i][0].transcript;
+
+          const database = firebase.database();
+
+          await database.ref("meetings/" + meetingId).set({
+            text: interim_transcript,
+          });
 
           setIntermediateText(interim_transcript);
         }
