@@ -1,13 +1,15 @@
 import { Box, Text } from "@chakra-ui/layout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUserId, getUserLanguage } from "utils/storage";
 
 const TranscriptBox = ({ messages }) => {
   const [transcript, setTranscript] = useState([]);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const userLanguage = getUserLanguage().split("-")[0];
     const userId = getUserId();
+
     const trans = [];
     messages.forEach((message) => {
       const text = message.texts.find((t) => t.lang === userLanguage);
@@ -21,6 +23,10 @@ const TranscriptBox = ({ messages }) => {
     });
 
     setTranscript(trans);
+    scrollRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   }, [messages]);
 
   return (
@@ -35,6 +41,7 @@ const TranscriptBox = ({ messages }) => {
           </Box>
         );
       })}
+      <div ref={scrollRef} />
     </Box>
   );
 };
