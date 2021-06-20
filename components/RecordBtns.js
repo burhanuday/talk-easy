@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import firebase from "firebase/app";
 import "firebase/database";
 import { init as initRecording, startRecording, stopRecording } from "utils/record";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { BiExit } from "react-icons/bi";
 import { getMeetingDetails, getUserId, getUserLanguage } from "utils/storage";
+import { useRouter } from "next/router";
 
-export default function RecordBtns({ meetingId }) {
+export default function RecordBtns({ meetingId, handleLeave }) {
+  const router = useRouter();
   const [recording, setRecording] = useState(false);
-  const [intermediateText, setIntermediateText] = useState("");
 
   useEffect(() => {
     const onResult = async (event) => {
@@ -16,10 +18,6 @@ export default function RecordBtns({ meetingId }) {
       try {
         if (event.results[0].isFinal) {
           const rawText = event.results[0][0].transcript;
-          setIntermediateText(rawText);
-
-          setTimeout(() => setIntermediateText(""), 2000);
-
           const data = getMeetingDetails();
 
           await fetch("/api/translate", {
@@ -45,8 +43,6 @@ export default function RecordBtns({ meetingId }) {
           await database.ref("meetings/" + meetingId).set({
             text: interim_transcript,
           });
-
-          setIntermediateText(interim_transcript);
         }
       } catch (e) {
         console.error(e);
@@ -63,11 +59,18 @@ export default function RecordBtns({ meetingId }) {
     setRecording((r) => !r);
   };
 
+  const handleLeaveStream = () => {
+    handleLeave();
+    router.replace("/");
+  };
+
   return (
-    <Flex px={2} py={2} borderRadius="md" bg="gray.100" ml={2}>
-      <Text flex={1}>{intermediateText}</Text>
+    <Flex justifyContent="space-between" px={2} py={2} borderRadius="md" bg="gray.100" ml={2}>
       <Button onClick={handleRecordClick} colorScheme="green">
         {!recording ? <FaMicrophone /> : <FaMicrophoneSlash />}
+      </Button>
+      <Button onClick={handleLeaveStream} leftIcon={<BiExit />} colorScheme="red">
+        Leave
       </Button>
     </Flex>
   );

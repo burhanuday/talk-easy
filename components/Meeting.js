@@ -60,33 +60,32 @@ const Meeting = () => {
    * Handle user pressing the leave button or
    * the other user pressed the leave button
    */
-  // const handleLeave = () => {
-  //   const rtc = rtcRef.current;
+  const handleLeave = () => {
+    const rtc = rtcRef.current;
 
-  //   // cleanup WebRTC streams
-  //   if (rtc && rtc.client) {
-  //     rtc.client.unpublish(rtc.localStream);
-  //     // stop playing local stream
-  //     rtc.localStream.stop();
+    // cleanup WebRTC streams
+    if (rtc && rtc.client) {
+      rtc.client.unpublish(rtc.localStream);
+      // stop playing local stream
+      rtc.localStream.stop();
 
-  //     // close local stream
-  //     if (rtc.localStream) {
-  //       rtc.localStream.close();
-  //     }
-  //     rtc.client.leave(() => {
-  //       // while (rtc.remoteStreams.length > 0) {
-  //       //   const stream = rtc.remoteStreams.shift();
-  //       //   stream.stop();
-  //       // }
-  //       // console.log("client leaves channel success");
+      // close local stream
+      if (rtc.localStream) rtc.localStream.close();
 
-  //       setJoined(false);
-  //       rtcRef.current = null;
+      rtc.client.leave(() => {
+        // while (rtc.remoteStreams.length > 0) {
+        //   const stream = rtc.remoteStreams.shift();
+        //   stream.stop();
+        // }
+        // console.log("client leaves channel success");
 
-  //       // send to dashboard
-  //     }, handleFail);
-  //   }
-  // };
+        setJoined(false);
+        rtcRef.current = null;
+
+        // send to dashboard
+      }, handleFail);
+    }
+  };
 
   useEffect(() => {
     initSpeaking();
@@ -329,7 +328,7 @@ const Meeting = () => {
 
         {/* Audio recording */}
         <Box w="100%">
-          <RecordBtns meetingId={meetingId} />
+          <RecordBtns meetingId={meetingId} handleLeave={handleLeave} />
         </Box>
       </Grid>
 
