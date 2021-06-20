@@ -4,7 +4,7 @@ const { Translate } = require("@google-cloud/translate").v2;
 // Creates a client
 const translate = new Translate({
   projectId: "talk-easy-d2267",
-  keyFilename: "service-account-key.json",
+  keyFilename: "./service-account-key.json",
 });
 
 /**
