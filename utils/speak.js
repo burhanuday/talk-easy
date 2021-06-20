@@ -19,6 +19,7 @@ export const init = () => {
 export const speak = (text) => {
   const lang = getUserLanguage();
   const msg = new SpeechSynthesisUtterance();
+  if (!voices?.length) voices = speechSynthesis.getVoices();
 
   if (voices) {
     msg.text = text;
