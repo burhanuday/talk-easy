@@ -34,7 +34,7 @@ export default function RecordBtns({ meetingId, handleLeave }) {
   useEffect(() => {
     const userId = getUserId();
     const onResult = async (event) => {
-      console.log(event.results);
+      // console.log(event.results);
       try {
         if (event.results[0].isFinal) {
           const rawText = event.results[0][0].transcript;
