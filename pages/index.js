@@ -15,6 +15,8 @@ import {
   Select,
   Box,
   IconButton,
+  CircularProgress,
+  Center,
 } from "@chakra-ui/react";
 import NewMeetingModal from "components/NewMeetingModal";
 import { appConfig } from "constants/app";
@@ -198,6 +200,10 @@ export default function Home() {
           <Heading mt={8} as="h3" size="md">
             History
           </Heading>
+
+          <Center>
+            {loadingHistory && <CircularProgress isIndeterminate color="green.500" />}
+          </Center>
 
           <Box p={4} height="40vh" overflowY="auto">
             {history.map((item) => {
