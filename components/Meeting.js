@@ -31,19 +31,20 @@ const Meeting = () => {
 
   const throtlledGoogleTranslate = useRef(
     throttle(async (text, from, to) => {
-      const result = await fetch("/api/only-translate", {
-        body: JSON.stringify({
-          text,
-          from,
-          to,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }).then((response) => response.json());
-      setSubtitle(result.text);
-    }, 500),
+      // const result = await fetch("/api/only-translate", {
+      //   body: JSON.stringify({
+      //     text,
+      //     from,
+      //     to,
+      //   }),
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   method: "POST",
+      // }).then((response) => response.json());
+      setSubtitle(text);
+      console.log(new Date().toLocaleTimeString(), text);
+    }, 1000),
   ).current;
 
   const rtcRef = useRef({
@@ -132,7 +133,7 @@ const Meeting = () => {
     const subtitleRef = firebase.database().ref("meetings/" + meetingId);
     subtitleRef.on("value", (snapshot) => {
       const data = snapshot.val();
-      // if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
+      if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
     });
 
     return () => {
