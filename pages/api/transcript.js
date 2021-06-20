@@ -15,10 +15,14 @@ export default async function handler(req, res) {
   try {
     const { docs } = await db.collection("meetings").doc(meetingId).collection("messages").get();
     for (const doc of docs) {
-      const { texts, createdAt, userId: messageUserId } = doc.data();
-      const { text } = texts.filter((item) => item.lang === lang)[0];
-      const date = createdAt.toDate().toLocaleString();
-      data.push(`[${date}] ${messageUserId === userId ? "You" : "Peer"} : ${text}`);
+      try {
+        const { texts, createdAt, userId: messageUserId } = doc.data();
+        const { text } = texts.filter((item) => item.lang === lang)[0];
+        const date = createdAt.toDate().toLocaleString();
+        data.push(`[${date}] ${messageUserId === userId ? "You" : "Peer"} : ${text}`);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     const filename = `${meetingId}-${userId}`;

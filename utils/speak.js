@@ -12,8 +12,8 @@ export const init = () => {
   speechSynthesis = window.speechSynthesis;
   setTimeout(() => {
     voices = speechSynthesis.getVoices();
-    console.log("timeout", voices);
-  }, 2000);
+    console.log("VOICES after Timeout", voices);
+  }, 3000);
 };
 
 export const speak = (text) => {
@@ -22,7 +22,11 @@ export const speak = (text) => {
 
   if (voices) {
     msg.text = text;
-    msg.voice = voices.filter((voice) => voice.lang === lang)[0];
+
+    let voice = voices.filter((voice) => voice.lang === lang);
+    if (!voice?.length) voice = voices.filter((voice) => voice.lang === "hi-IN");
+
+    msg.voice = voice[0];
     speechSynthesis.speak(msg);
   } else {
     console.error("VOICES NAHI HAI");
