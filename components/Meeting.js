@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -13,7 +12,6 @@ import { init as initSpeaking, speak } from "utils/speak";
 import TranscriptBox from "./TranscriptBox";
 import RecordBtns from "./RecordBtns";
 import throttle from "lodash.throttle";
-import { googleTranslate } from "utils/translate";
 
 const Meeting = () => {
   const userLanguage = getUserLanguage().split("-")[0];
@@ -31,18 +29,18 @@ const Meeting = () => {
 
   const throtlledGoogleTranslate = useRef(
     throttle(async (text, from, to) => {
-      // const result = await fetch("/api/only-translate", {
-      //   body: JSON.stringify({
-      //     text,
-      //     from,
-      //     to,
-      //   }),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   method: "POST",
-      // }).then((response) => response.json());
-      setSubtitle(text);
+      const result = await fetch("/api/only-translate", {
+        body: JSON.stringify({
+          text,
+          from,
+          to,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+      }).then((response) => response.json());
+      setSubtitle(result.text);
       console.log(new Date().toLocaleTimeString(), text);
     }, 1000),
   ).current;
@@ -62,33 +60,33 @@ const Meeting = () => {
    * Handle user pressing the leave button or
    * the other user pressed the leave button
    */
-  const handleLeave = () => {
-    const rtc = rtcRef.current;
+  // const handleLeave = () => {
+  //   const rtc = rtcRef.current;
 
-    // cleanup WebRTC streams
-    if (rtc && rtc.client) {
-      rtc.client.unpublish(rtc.localStream);
-      // stop playing local stream
-      rtc.localStream.stop();
+  //   // cleanup WebRTC streams
+  //   if (rtc && rtc.client) {
+  //     rtc.client.unpublish(rtc.localStream);
+  //     // stop playing local stream
+  //     rtc.localStream.stop();
 
-      // close local stream
-      if (rtc.localStream) {
-        rtc.localStream.close();
-      }
-      rtc.client.leave(() => {
-        // while (rtc.remoteStreams.length > 0) {
-        //   const stream = rtc.remoteStreams.shift();
-        //   stream.stop();
-        // }
-        // console.log("client leaves channel success");
+  //     // close local stream
+  //     if (rtc.localStream) {
+  //       rtc.localStream.close();
+  //     }
+  //     rtc.client.leave(() => {
+  //       // while (rtc.remoteStreams.length > 0) {
+  //       //   const stream = rtc.remoteStreams.shift();
+  //       //   stream.stop();
+  //       // }
+  //       // console.log("client leaves channel success");
 
-        setJoined(false);
-        rtcRef.current = null;
+  //       setJoined(false);
+  //       rtcRef.current = null;
 
-        // send to dashboard
-      }, handleFail);
-    }
-  };
+  //       // send to dashboard
+  //     }, handleFail);
+  //   }
+  // };
 
   useEffect(() => {
     initSpeaking();

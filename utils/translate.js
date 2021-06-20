@@ -1,11 +1,4 @@
-// import translate from "translation-google";
-const { Translate } = require("@google-cloud/translate").v2;
-
-// Creates a client
-const translate = new Translate({
-  projectId: "talk-easy-d2267",
-  keyFilename: "../service-account-key.json",
-});
+import translate from "translation-google";
 
 /**
  * Translate a sentence from initial language to target language
@@ -15,18 +8,12 @@ const translate = new Translate({
  * @returns translated text
  */
 export const googleTranslate = async (text, from, to) => {
+  console.log("data in translate", text, from, to);
   try {
-    let [translations] = await translate.translate(text, to);
-    translations = Array.isArray(translations) ? translations : [translations];
-    console.log("Translations:");
-    const data = translations[0];
-    if (data) {
-      return data;
-    } else {
-      return "";
-    }
+    const res = await translate(text, { from: "auto", to });
+    return res.text;
   } catch (error) {
-    console.log(error.message);
+    console.log("error while translating", error);
     return "";
   }
 };
