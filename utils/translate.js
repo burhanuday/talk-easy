@@ -1,4 +1,11 @@
-import translate from "translation-google";
+// import translate from "translation-google";
+const { Translate } = require("@google-cloud/translate").v2;
+
+// Creates a client
+const translate = new Translate({
+  projectId: "talk-easy-d2267",
+  keyFilename: "../service-account-key.json",
+});
 
 /**
  * Translate a sentence from initial language to target language
@@ -8,12 +15,18 @@ import translate from "translation-google";
  * @returns translated text
  */
 export const googleTranslate = async (text, from, to) => {
-  console.log("data in translate", text, from, to);
   try {
-    const res = await translate(text, { from: "auto", to });
-    return res.text;
+    let [translations] = await translate.translate(text, to);
+    translations = Array.isArray(translations) ? translations : [translations];
+    console.log("Translations:");
+    const data = translations[0];
+    if (data) {
+      return data;
+    } else {
+      return "";
+    }
   } catch (error) {
-    console.log("error while translating", error);
+    console.log(error.message);
     return "";
   }
 };

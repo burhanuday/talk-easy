@@ -12,6 +12,7 @@
     "@chakra-ui/react": "^1.6.3",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
+    "@google-cloud/translate": "^6.2.2",
     "agora-access-token": "^2.0.4",
     "agora-rtc-sdk": "^3.6.0",
     "firebase": "^8.6.8",
