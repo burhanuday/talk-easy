@@ -13,6 +13,7 @@ export default function RecordBtns({ meetingId, handleLeave }) {
   const [recording, setRecording] = useState(false);
 
   useEffect(() => {
+    const userId = getUserId();
     const onResult = async (event) => {
       // console.log(event.results);
       try {
@@ -42,6 +43,7 @@ export default function RecordBtns({ meetingId, handleLeave }) {
 
           await database.ref("meetings/" + meetingId).set({
             text: interim_transcript,
+            userId: userId,
           });
         }
       } catch (e) {
@@ -50,7 +52,7 @@ export default function RecordBtns({ meetingId, handleLeave }) {
     };
     initRecording(onResult);
     return () => {};
-  }, []);
+  }, [meetingId]);
 
   const handleRecordClick = () => {
     if (!recording) startRecording();

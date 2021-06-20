@@ -14,9 +14,6 @@ import RecordBtns from "./RecordBtns";
 import throttle from "lodash.throttle";
 
 const Meeting = () => {
-  const userLanguage = getUserLanguage().split("-")[0];
-  const userId = getUserId();
-
   const router = useRouter();
   const { meetingId } = router.query;
 
@@ -89,6 +86,8 @@ const Meeting = () => {
 
   useEffect(() => {
     initSpeaking();
+    const userId = getUserId();
+    const userLanguage = getUserLanguage().split("-")[0];
 
     const userLanguageForTranslation = getUserLanguage().split("-")[0];
 
@@ -130,14 +129,18 @@ const Meeting = () => {
     const subtitleRef = firebase.database().ref("meetings/" + meetingId);
     subtitleRef.on("value", (snapshot) => {
       const data = snapshot.val();
-      if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
+      if (data.userId !== userId) {
+        if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
+      } else {
+        setSubtitle(data.text);
+      }
     });
 
     return () => {
       unsubs();
       unsubscribe();
     };
-  }, [meetingId, userLanguage, userId, throtlledGoogleTranslate]);
+  }, [meetingId, throtlledGoogleTranslate]);
 
   const addParticipantToMeeting = useCallback(async () => {
     const userId = getUserId();
