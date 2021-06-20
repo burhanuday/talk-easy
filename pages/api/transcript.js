@@ -13,7 +13,12 @@ export default async function handler(req, res) {
   const data = [];
 
   try {
-    const { docs } = await db.collection("meetings").doc(meetingId).collection("messages").get();
+    const { docs } = await db
+      .collection("meetings")
+      .doc(meetingId)
+      .collection("messages")
+      .orderBy("createdAt", "asc")
+      .get();
     for (const doc of docs) {
       try {
         const { texts, createdAt, userId: messageUserId } = doc.data();
