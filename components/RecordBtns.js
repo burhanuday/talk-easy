@@ -11,6 +11,7 @@ export default function RecordBtns({ meetingId }) {
   const [intermediateText, setIntermediateText] = useState("");
 
   useEffect(() => {
+    const userId = getUserId();
     const onResult = async (event) => {
       // console.log(event.results);
       try {
@@ -44,6 +45,7 @@ export default function RecordBtns({ meetingId }) {
 
           await database.ref("meetings/" + meetingId).set({
             text: interim_transcript,
+            userId: userId,
           });
 
           setIntermediateText(interim_transcript);
@@ -54,7 +56,7 @@ export default function RecordBtns({ meetingId }) {
     };
     initRecording(onResult);
     return () => {};
-  }, []);
+  }, [meetingId]);
 
   const handleRecordClick = () => {
     if (!recording) startRecording();
