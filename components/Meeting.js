@@ -129,7 +129,7 @@ const Meeting = () => {
     const subtitleRef = firebase.database().ref("meetings/" + meetingId);
     subtitleRef.on("value", (snapshot) => {
       const data = snapshot.val();
-      if (data.userId !== userId) {
+      if (data?.userId !== userId) {
         if (data) throtlledGoogleTranslate(data.text, "", userLanguageForTranslation);
       } else {
         setSubtitle(data.text);

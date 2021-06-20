@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import firebase from "firebase/app";
 import "firebase/database";
 import { init as initRecording, startRecording, stopRecording } from "utils/record";
@@ -7,33 +7,40 @@ import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { BiExit } from "react-icons/bi";
 import { getMeetingDetails, getUserId, getUserLanguage } from "utils/storage";
 import { useRouter } from "next/router";
+import { throttle } from "lodash";
 
 export default function RecordBtns({ meetingId, handleLeave }) {
   const router = useRouter();
   const [recording, setRecording] = useState(false);
 
+  const throttledAddMessage = useRef(
+    throttle(async (rawText, data) => {
+      await fetch("/api/translate", {
+        method: "POST",
+        body: JSON.stringify({
+          rawText,
+          meetingId: data.id,
+          userId: getUserId(),
+          languages: data.languages,
+          userLanguage: getUserLanguage().split("-")[0],
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }, 500),
+  ).current;
+
   useEffect(() => {
     const userId = getUserId();
     const onResult = async (event) => {
-      // console.log(event.results);
+      console.log(event.results);
       try {
         if (event.results[0].isFinal) {
           const rawText = event.results[0][0].transcript;
           const data = getMeetingDetails();
 
-          await fetch("/api/translate", {
-            method: "POST",
-            body: JSON.stringify({
-              rawText,
-              meetingId: data.id,
-              userId: getUserId(),
-              languages: data.languages,
-              userLanguage: getUserLanguage().split("-")[0],
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          throttledAddMessage(rawText, data);
         } else {
           let interim_transcript = "";
           for (let i = event.resultIndex; i < event.results.length; ++i)
