@@ -23,6 +23,7 @@ import { appConfig } from "constants/app";
 import { langaugeOptions } from "constants/supportedLanguages";
 import { getUserId, getUserLanguage, setUserLanguage } from "utils/storage";
 import { FaFileDownload } from "react-icons/fa";
+import DisclaimerModal from "components/DisclaimerModal";
 
 export default function Home() {
   const [link, setLink] = useState("");
@@ -34,6 +35,11 @@ export default function Home() {
   const [transcriptionLoading, setTranscriptionLoading] = useState(false);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isDisclaimerOpen,
+    onOpen: onDisclaimerOpen,
+    onClose: onDisclaimerClose,
+  } = useDisclosure();
 
   const router = useRouter();
   const handleLinkChange = (e) => {
@@ -130,13 +136,14 @@ export default function Home() {
 
   useEffect(() => {
     setSelectedLanguage(getUserLanguage() || "en-IN");
+    onDisclaimerOpen();
 
     const f = async () => {
       await fetchHistory();
     };
 
     f();
-  }, []);
+  }, [onDisclaimerOpen]);
 
   return (
     <div>
@@ -236,6 +243,7 @@ export default function Home() {
         </Flex>
 
         <NewMeetingModal isOpen={isOpen} onClose={onClose} meetingId={newMeetingId} />
+        <DisclaimerModal isOpen={isDisclaimerOpen} onClose={onDisclaimerClose} />
       </Container>
     </div>
   );
