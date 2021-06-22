@@ -12,6 +12,8 @@ import { init as initSpeaking, speak } from "services/speak";
 import TranscriptBox from "./TranscriptBox";
 import RecordBtns from "./RecordBtns";
 import throttle from "lodash.throttle";
+import { fetchSubtitle } from "services/subtitle-translate";
+import { listenToMeetingChanges, listenToMessageChanges } from "services/meeting";
 
 const Meeting = () => {
   const router = useRouter();
@@ -26,19 +28,8 @@ const Meeting = () => {
 
   const throtlledGoogleTranslate = useRef(
     throttle(async (text, from, to) => {
-      const result = await fetch("/api/only-translate", {
-        body: JSON.stringify({
-          text,
-          from,
-          to,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      }).then((response) => response.json());
+      const result = await fetchSubtitle(text, from, to);
       setSubtitle(result.text);
-      console.log(new Date().toLocaleTimeString(), text);
     }, 1000),
   ).current;
 
@@ -91,40 +82,30 @@ const Meeting = () => {
 
     const userLanguageForTranslation = getUserLanguage().split("-")[0];
 
-    const db = firebase.firestore();
+    const unsubscribeToMeetingChanges = listenToMeetingChanges(meetingId, (snapshot) => {
+      setMeetingDetails({ id: meetingId, ...snapshot.data() });
+    });
 
-    const unsubs = db
-      .collection("meetings")
-      .doc(meetingId)
-      .onSnapshot((snapshot) => {
-        setMeetingDetails({ id: meetingId, ...snapshot.data() });
-      });
-
-    const unsubscribe = db
-      .collection("meetings")
-      .doc(meetingId)
-      .collection("messages")
-      .orderBy("createdAt", "asc")
-      .onSnapshot((docs) => {
-        const newMessages = [];
-        docs.forEach((doc) => {
-          newMessages.push({
-            id: doc.id,
-            ...doc.data(),
-          });
+    const unsubscribeMessageChangeListener = listenToMessageChanges(meetingId, (docs) => {
+      const newMessages = [];
+      docs.forEach((doc) => {
+        newMessages.push({
+          id: doc.id,
+          ...doc.data(),
         });
-
-        if (newMessages.length) {
-          const message = newMessages[newMessages.length - 1];
-          if (message.userId !== userId) {
-            const { text } = message.texts.find((t) => t.lang === userLanguage);
-            speak(text);
-          }
-        }
-
-        setMessages(newMessages);
-        setSubtitle("");
       });
+
+      if (newMessages.length) {
+        const message = newMessages[newMessages.length - 1];
+        if (message.userId !== userId) {
+          const { text } = message.texts.find((t) => t.lang === userLanguage);
+          speak(text);
+        }
+      }
+
+      setMessages(newMessages);
+      setSubtitle("");
+    });
 
     const subtitleRef = firebase.database().ref("meetings/" + meetingId);
     subtitleRef.on("value", (snapshot) => {
@@ -137,8 +118,8 @@ const Meeting = () => {
     });
 
     return () => {
-      unsubs();
-      unsubscribe();
+      unsubscribeToMeetingChanges();
+      unsubscribeMessageChangeListener();
     };
   }, [meetingId, throtlledGoogleTranslate]);
 

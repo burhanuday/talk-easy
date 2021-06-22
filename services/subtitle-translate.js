@@ -30,3 +30,33 @@ export const subtitleGoogleTranslate = async (text, from, to) => {
     return "";
   }
 };
+
+/**
+ * Fetch subtitle for a intermediary text
+ * @param {string} text text to fetch subtitle for
+ * @param {string} from initial language
+ * @param {string} to target language
+ * @returns translated subtitle
+ */
+export const fetchSubtitle = async (text, from, to) => {
+  try {
+    let result = await fetch("/api/only-translate", {
+      body: JSON.stringify({
+        text,
+        from,
+        to,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    }).then((response) => response.json());
+
+    result = await result.json();
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    return "Error while fetching subtitles";
+  }
+};
