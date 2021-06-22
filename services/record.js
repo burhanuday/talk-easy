@@ -1,4 +1,4 @@
-import { getUserLanguage } from "utils/storage";
+import { getUserLanguage } from "services/storage";
 
 let recognition;
 

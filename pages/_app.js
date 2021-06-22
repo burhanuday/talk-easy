@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 
 import { ChakraProvider } from "@chakra-ui/react";
-import { firebaseInit, signInAnonymously } from "utils/firebase";
-import { getUserLanguage, setUserLanguage } from "utils/storage";
+import { firebaseInit } from "utils/firebase";
+import { getUserLanguage, setUserLanguage } from "services/storage";
+import { signInAnonymously } from "services/auth";
 
 firebaseInit();
 

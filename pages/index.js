@@ -21,7 +21,7 @@ import {
 import NewMeetingModal from "components/NewMeetingModal";
 import { appConfig } from "constants/app";
 import { langaugeOptions } from "constants/supportedLanguages";
-import { getUserId, getUserLanguage, setUserLanguage } from "utils/storage";
+import { getUserId, getUserLanguage, setUserLanguage } from "services/storage";
 import { FaFileDownload } from "react-icons/fa";
 import DisclaimerModal from "components/DisclaimerModal";
 

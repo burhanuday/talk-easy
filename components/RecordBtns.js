@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import firebase from "firebase/app";
 import "firebase/database";
-import { init as initRecording, startRecording, stopRecording } from "utils/record";
+import { init as initRecording, startRecording, stopRecording } from "services/record";
 import { Button, Flex } from "@chakra-ui/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { BiExit } from "react-icons/bi";
-import { getMeetingDetails, getUserId, getUserLanguage } from "utils/storage";
+import { getMeetingDetails, getUserId, getUserLanguage } from "services/storage";
 import { useRouter } from "next/router";
 import { throttle } from "lodash";
 

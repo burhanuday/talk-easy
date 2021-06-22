@@ -1,4 +1,4 @@
-const { storage } = require("constants/Storage");
+const { storage } = require("constants/storage");
 
 export const getUserId = () => localStorage.getItem(storage.userId);
 

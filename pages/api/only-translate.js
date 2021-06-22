@@ -1,4 +1,4 @@
-import { subtitleGoogleTranslate } from "utils/subtitle-translate";
+import { subtitleGoogleTranslate } from "services/subtitle-translate";
 
 export default async function handler(req, res) {
   if (req.method === "POST") {

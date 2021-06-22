@@ -7,8 +7,8 @@ import { agoraPublicKeys } from "constants/agora";
 import { Flex, Grid, Box } from "@chakra-ui/react";
 
 import AgoraRTC from "agora-rtc-sdk";
-import { getUserId, getUserLanguage, setMeetingDetails } from "utils/storage";
-import { init as initSpeaking, speak } from "utils/speak";
+import { getUserId, getUserLanguage, setMeetingDetails } from "services/storage";
+import { init as initSpeaking, speak } from "services/speak";
 import TranscriptBox from "./TranscriptBox";
 import RecordBtns from "./RecordBtns";
 import throttle from "lodash.throttle";

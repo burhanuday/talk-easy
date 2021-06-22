@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/layout";
 import { useEffect, useRef, useState } from "react";
-import { getUserId, getUserLanguage } from "utils/storage";
+import { getUserId, getUserLanguage } from "services/storage";
 
 const TranscriptBox = ({ messages }) => {
   const [transcript, setTranscript] = useState([]);

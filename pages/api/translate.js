@@ -1,5 +1,5 @@
 import { db, firestore } from "utils/firebase-admin";
-import { googleTranslate } from "utils/translate";
+import { googleTranslate } from "services/translate";
 
 export default async function handler(req, res) {
   // console.log(req.body);
