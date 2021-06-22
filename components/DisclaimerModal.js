@@ -16,8 +16,8 @@ const DisclaimerModal = ({ isOpen, onClose }) => {
       <ModalContent>
         <ModalHeader>Disclaimer</ModalHeader>
         <ModalBody>
-          <Text>This website is for demo purpose only.</Text>
-          <Text>Some features like subtitles might not work to reduce our bills.</Text>
+          <Text>This website is for demo purpose only. Expect bugs!</Text>
+          <Text>Subtitle feature is disabled on the version deployed to Vercel</Text>
         </ModalBody>
 
         <ModalFooter>
