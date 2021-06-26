@@ -52,7 +52,7 @@ Add the `firebase-admin` service account config in the root directory in a file 
 
 For realtime subtitles to work, you will need to create a service account on Google Cloud which has access to Cloud Translation API. Create a file called `service-account-key.json` in the root directory
 
-First, run the development server:
+Finally, run the development server:
 
 ```bash
 npm run dev
@@ -61,3 +61,7 @@ yarn dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the website.
+
+## License
+
+MIT
